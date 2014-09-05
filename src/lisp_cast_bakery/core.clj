@@ -1,4 +1,5 @@
-(ns lisp-cast-bakery.core)
+(ns lisp-cast-bakery.core
+  (:use bakery.core))
 
 (defn foo
   "I don't do a whole lot."
