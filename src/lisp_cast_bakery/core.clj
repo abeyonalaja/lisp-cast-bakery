@@ -68,54 +68,54 @@
 
 (defn add-squeezed
   ([ingredient]
-     (add-squeezed ingredient 1))
+   (add-squeezed ingredient 1))
   ([ingredient amount]
-     (if (squeezed? ingredient)
-       (dotimes [i amount]
-         (grab ingredient)
-         (squeeze)
-         (add-to-bowl))
-       (error "This function only works on squeezed ingredients. You asked me to squeeze" ingredient))))
+   (if (squeezed? ingredient)
+     (dotimes [i amount]
+       (grab ingredient)
+       (squeeze)
+       (add-to-bowl))
+     (error "This function only works on squeezed ingredients. You asked me to squeeze" ingredient))))
 
 (defn add-scooped
   ([ingredient]
-     (add-scooped ingredient 1))
+   (add-scooped ingredient 1))
   ([ingredient amount]
-     (if (scooped? ingredient)
-       (do
-         (grab :cup)
-         (dotimes [i amount]
-          (scoop ingredient)
-          (add-to-bowl))
-         (release))
-       (error "This function only works on scooped ingredients. You asked me to scoop" ingredient))))
+   (if (scooped? ingredient)
+     (do
+       (grab :cup)
+       (dotimes [i amount]
+         (scoop ingredient)
+         (add-to-bowl))
+       (release))
+     (error "This function only works on scooped ingredients. You asked me to scoop" ingredient))))
 
 (defn add-simple
   ([ingredient]
-     (add-simple ingredient 1))
+   (add-simple ingredient 1))
   ([ingredient amount]
-     (if (simple? ingredient)
-       (dotimes [i amount]
-         (grab ingredient)
-         (add-to-bowl))
-       ( error "This function only works on simple ingredients. You asked me to add" ingredient))))
+   (if (simple? ingredient)
+     (dotimes [i amount]
+       (grab ingredient)
+       (add-to-bowl))
+     ( error "This function only works on simple ingredients. You asked me to add" ingredient))))
 
 (defn add
   ([ingredient]
-     (add ingredient 1))
+   (add ingredient 1))
   ([ingredient amount]
-     (cond
-      (squeezed? ingredient)
-      (add-squeezed ingredient amount)
+   (cond
+     (squeezed? ingredient)
+     (add-squeezed ingredient amount)
 
-      (simple? ingredient)
-      (add-simple ingredient amount)
+     (simple? ingredient)
+     (add-simple ingredient amount)
 
-      (scooped? ingredient)
-      (add-scooped ingredient amount)
+     (scooped? ingredient)
+     (add-scooped ingredient amount)
 
-      :else
-       (error "I do not have the ingredient" ingredient))))
+     :else
+     (error "I do not have the ingredient" ingredient))))
 
 (defn bake-cake []
   (add :egg 2)
@@ -151,19 +151,30 @@
 (defn from-fridge? [ingredient]
   (contains? fridge-ingredients ingredient))
 
-(defn fetch-ingredient "doc-string"
-  ([ingredient]
-   (fetch-ingredient ingredient 1))
-  ([ingredient amount]
-   (cond
-     (from-fridge?  ingredient)
-     (fetch-from-fridge ingredient amount)
-     
-     (from-pantry? ingredient)
-     (fetch-from-pantry ingredient amount)
-     
-     :else
-     (error "I dont know where to get" ingredient))))
+(defn load-up-amount [ingredient amount]
+  (dotimes [i amount]
+    (load-up ingredient)))
+
+(defn unload-amount [ingredient amount]
+  (dotimes [i amount]
+    (unload ingredient)))
+
+(defn fetch-list "doc-string" [shopping-list]
+  (go-to :pantry)
+  (load-up-amount :flour (:flour shopping-list 0))
+  (load-up-amount :sugar (:sugar shopping-list 0))
+
+  (go-to :fridge)
+  (load-up-amount :egg (:egg shopping-list 0))
+  (load-up-amount :milk (:milk shopping-list 0))
+  (load-up-amount :butter (:butter shopping-list 0))
+  (unload :milk (:milk shopping-list 0))
+
+  (go-to :prep-area)
+  (unload-amount :flour (:flour shopping-list 0))
+  (unload-amount :sugar (:sugar shopping-list 0))
+  (unload-amount :egg (:egg shopping-list 0))
+  (unload-amount :butter (:butter shopping-list 0)))
 
 (defn fetch-from-pantry "doc-string" 
   ([ingredient]
@@ -193,6 +204,19 @@
          (unload ingredient)))
      (error "This function only works on ingredients that are stored in the fridge"))))
 
+(defn fetch-ingredient "doc-string"
+  ([ingredient]
+   (fetch-ingredient ingredient 1))
+  ([ingredient amount]
+   (cond
+     (from-fridge?  ingredient)
+     (fetch-from-fridge ingredient amount)
+
+     (from-pantry? ingredient)
+     (fetch-from-pantry ingredient amount)
+
+     :else
+     (error "I dont know where to get" ingredient))))
 
 (defn foo
   "I don't do a whole lot."
