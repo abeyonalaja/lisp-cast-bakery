@@ -161,20 +161,17 @@
 
 (defn fetch-list "doc-string" [shopping-list]
   (go-to :pantry)
-  (load-up-amount :flour (:flour shopping-list 0))
-  (load-up-amount :sugar (:sugar shopping-list 0))
+  (doseq [ingredient pantry-ingredients]
+    (load-up-amount ingredient (shopping-list ingredient 0)))
 
   (go-to :fridge)
-  (load-up-amount :egg (:egg shopping-list 0))
-  (load-up-amount :milk (:milk shopping-list 0))
-  (load-up-amount :butter (:butter shopping-list 0))
-  (unload :milk (:milk shopping-list 0))
-
+  (doseq [ingredient fridge-ingredients]
+    (load-up-amount ingredient (shopping-list ingredient 0)))
   (go-to :prep-area)
-  (unload-amount :flour (:flour shopping-list 0))
-  (unload-amount :sugar (:sugar shopping-list 0))
-  (unload-amount :egg (:egg shopping-list 0))
-  (unload-amount :butter (:butter shopping-list 0)))
+  (doseq [ingredient pantry-ingredients]
+    (unload-amount ingredient (shopping-list ingredient 0)))
+  (doseq [ingredient fridge-ingredients]
+    (unload-amount ingredient (shopping-list ingredient 0))))
 
 (defn fetch-from-pantry "doc-string" 
   ([ingredient]
